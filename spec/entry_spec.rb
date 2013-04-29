@@ -15,6 +15,7 @@ describe Entry do
 		@user.name = "test"
 		@user.pw = "foobar"
 		@user.expires_at = Time.now + 600
+		@user.email = "foo@bar.com"
 		@user.save
 		@auth = Entry::Auth.create(:time => Time.new)
 	end
@@ -32,7 +33,8 @@ describe Entry do
 	describe "when name is set" do
 		it "must be unique" do
 			proc do 
-				Entry::User.create(:name => "test", :pw => "foo", :expires_at => Time.now)
+				Entry::User.create(:name => "test", :pw => "foo",
+						   :expires_at => Time.now)
 			end.must_raise Ohm::UniqueIndexViolation
 		end
 
@@ -81,6 +83,16 @@ describe Entry do
 		it "will be invalid if the current time is after the expire time" do
 			@user.expires_at = Time.now - 600
 			@user.expired?.must_equal true
+		end
+	end
+
+	describe "an email can be stored" do
+		it "will reside in the email attribute" do
+			@user.email.must_equal "foo@bar.com"
+		end
+
+		it "can be indexed" do
+			Entry::User.find(:email => "foo@bar.com").empty?.must_equal false
 		end
 	end
 end

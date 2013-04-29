@@ -16,9 +16,11 @@ module Entry
 		attribute :name
 		attribute :pw
 		attribute :expires_at
+		attribute :email
 		list :auths, Auth
 		unique :name
 		index :name
+		index :email
 
 		def validate
 			assert_present :name
