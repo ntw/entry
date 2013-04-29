@@ -14,6 +14,7 @@ describe Entry do
 		@user = Entry::User.new
 		@user.name = "test"
 		@user.pw = "foobar"
+		@user.expires_at = Time.now + 600
 		@user.save
 		@auth = Entry::Auth.create(:time => Time.new)
 	end
@@ -30,7 +31,9 @@ describe Entry do
 
 	describe "when name is set" do
 		it "must be unique" do
-			proc {Entry::User.create(:name => "test", :pw => "foo")}.must_raise Ohm::UniqueIndexViolation
+			proc do 
+				Entry::User.create(:name => "test", :pw => "foo", :expires_at => Time.now)
+			end.must_raise Ohm::UniqueIndexViolation
 		end
 
 		it "is valid" do
@@ -55,12 +58,29 @@ describe Entry do
 		end
 
 		it "can accept a new Auth" do
-			@user.auths.unshift(@auth).must_equal 1
+			@user.auths.push(@auth).must_equal 1
 		end
 
 		it "can return the list of Auths" do
-			@user.auths.unshift(@auth)
+			@user.auths.push(@auth)
 			@user.auths.wont_equal nil
+		end
+
+		it "can get the last login" do
+			@user.auths.push(@auth)
+			@user.auths.last.time.must_equal @auth.time.to_s
+		end
+	end
+
+	describe "the login is valid until it expires" do
+		it "will be valid if the current time is before the expire time" do
+			@user.expires_at = Time.now + 600
+			@user.expired?.must_equal false
+		end
+
+		it "will be invalid if the current time is after the expire time" do
+			@user.expires_at = Time.now - 600
+			@user.expired?.must_equal true
 		end
 	end
 end
