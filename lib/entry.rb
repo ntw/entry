@@ -17,6 +17,7 @@ module Entry
 		attribute :email
 		list :auths, Auth
 		unique :name
+		unique :email
 		index :name
 		index :email
 

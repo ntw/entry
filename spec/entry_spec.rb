@@ -94,5 +94,12 @@ describe Entry do
 		it "can be indexed" do
 			Entry::User.find(:email => "foo@bar.com").empty?.must_equal false
 		end
+
+		it "is unique" do
+			proc do 
+				Entry::User.create(:name => "unique", :pw => "foo",
+						   :expires_at => Time.now, :email => "foo@bar.com")
+			end.must_raise Ohm::UniqueIndexViolation
+		end
 	end
 end
