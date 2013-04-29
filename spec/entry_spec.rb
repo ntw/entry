@@ -43,4 +43,10 @@ describe Entry do
 			@user.valid?.must_equal false
 		end
 	end
+
+	describe "auths keeps a list of authorizations" do
+		it "can respond to a request" do
+			@user.must_respond_to :auths
+		end
+	end
 end

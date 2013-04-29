@@ -8,9 +8,13 @@ module Entry
 		end
 	end
 
+	class Auth < Ohm::Model
+	end
+
 	class User < Ohm::Model
 		attribute :name
 		attribute :pw
+		list :auths, Auth
 		unique :name
 		index :name
 
