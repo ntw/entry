@@ -14,10 +14,10 @@ describe Entry do
 		@user = Entry::User.new
 		@user.name = "test"
 		@user.pw = "foobar"
-		@user.expires_at = Time.now + 600
+		@user.expires_at = Time.now.to_i + 600
 		@user.email = "foo@bar.com"
 		@user.save
-		@auth = Entry::Auth.create(:time => Time.new)
+		@auth = Entry::Auth.create(:time => Time.new.to_i)
 	end
 
 	after do
@@ -34,7 +34,7 @@ describe Entry do
 		it "must be unique" do
 			proc do 
 				Entry::User.create(:name => "test", :pw => "foo",
-						   :expires_at => Time.now)
+						   :expires_at => Time.now.to_i)
 			end.must_raise Ohm::UniqueIndexViolation
 		end
 
@@ -76,12 +76,12 @@ describe Entry do
 
 	describe "the login is valid until it expires" do
 		it "will be valid if the current time is before the expire time" do
-			@user.expires_at = Time.now + 600
+			@user.expires_at = Time.now.to_i + 600
 			@user.expired?.must_equal false
 		end
 
 		it "will be invalid if the current time is after the expire time" do
-			@user.expires_at = Time.now - 600
+			@user.expires_at = Time.now.to_i - 600
 			@user.expired?.must_equal true
 		end
 	end
@@ -95,11 +95,35 @@ describe Entry do
 			Entry::User.find(:email => "foo@bar.com").empty?.must_equal false
 		end
 
-		it "is unique" do
+		it "must be unique" do
 			proc do 
 				Entry::User.create(:name => "unique", :pw => "foo",
-						   :expires_at => Time.now, :email => "foo@bar.com")
+						   :expires_at => Time.now.to_i, :email => "foo@bar.com")
 			end.must_raise Ohm::UniqueIndexViolation
+		end
+	end
+
+	describe "authorized? lets us know if the user is authorized to log in" do
+		it "can be passed a name" do
+			Entry.authorized?(:name => "test", :pw => "foobar").must_equal true
+		end
+
+		it "can be passed an email" do
+			Entry.authorized?(:email => "foo@bar.com", :pw => "foobar").must_equal true
+		end
+
+		it "returns false when passed the wrong password" do
+			Entry.authorized?(:name => "test", :pw => "WRONG").must_equal false
+		end
+
+		it "returns false when passed a non-existant user" do
+			Entry.authorized?(:name => "nobody", :pw => "foobar").must_equal false
+		end
+
+		it "returns false when the account is expired" do
+			@user.expires_at = Time.now.to_i - 10
+			@user.save
+			Entry.authorized?(:name => "test", :pw => "foobar").must_equal false
 		end
 	end
 end
