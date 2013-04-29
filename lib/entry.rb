@@ -9,6 +9,7 @@ module Entry
 	end
 
 	class Auth < Ohm::Model
+		attribute :time
 	end
 
 	class User < Ohm::Model

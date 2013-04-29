@@ -2,18 +2,23 @@ require 'minitest/spec'
 require 'minitest/autorun'
 require'../lib/entry.rb'
 
+MiniTest::Unit.after_tests do
+	Ohm.redis.flushdb
+end
+
 describe Entry do
 
 	before do
+		Ohm.redis.flushdb
 		@gk = Entry::GateKeeper.new(:db => 1)
 		@user = Entry::User.new
 		@user.name = "test"
 		@user.pw = "foobar"
 		@user.save
+		@auth = Entry::Auth.create(:time => Time.new)
 	end
 
 	after do
-		Ohm.redis.flushdb
 	end
 
 	describe "when name is empty" do
@@ -47,6 +52,15 @@ describe Entry do
 	describe "auths keeps a list of authorizations" do
 		it "can respond to a request" do
 			@user.must_respond_to :auths
+		end
+
+		it "can accept a new Auth" do
+			@user.auths.unshift(@auth).must_equal 1
+		end
+
+		it "can return the list of Auths" do
+			@user.auths.unshift(@auth)
+			@user.auths.wont_equal nil
 		end
 	end
 end
