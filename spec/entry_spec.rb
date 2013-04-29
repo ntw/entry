@@ -10,7 +10,7 @@ describe Entry do
 
 	before do
 		Ohm.redis.flushdb
-		@gk = Entry::GateKeeper.new(:db => 1)
+		Entry.connect(:db => 1)
 		@user = Entry::User.new
 		@user.name = "test"
 		@user.pw = "foobar"

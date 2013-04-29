@@ -2,10 +2,8 @@ require 'redis'
 require 'ohm'
 
 module Entry
-	class GateKeeper
-		def initialize(options = {})
-			Ohm.connect(options)
-		end
+	def self.connect(options = {})
+		Ohm.connect(options)
 	end
 
 	class Auth < Ohm::Model
