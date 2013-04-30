@@ -7,9 +7,9 @@ module Entry
 	end
 
 	def self.authorized?(options = {})
-		def_options = {:name => "", :email => "", :pw => ""}
+		def_options = {:name => "", :pw => ""}
 		options = def_options.merge(options)
-		user = User.find(:name => options[:name]).union(:email => options[:email]).first
+		user = User.find(:name => options[:name]).first
 		(user != nil) && (user.pw == options[:pw]) && (!user.expired?)
 	end
 

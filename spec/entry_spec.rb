@@ -108,10 +108,6 @@ describe Entry do
 			Entry.authorized?(:name => "test", :pw => "foobar").must_equal true
 		end
 
-		it "can be passed an email" do
-			Entry.authorized?(:email => "foo@bar.com", :pw => "foobar").must_equal true
-		end
-
 		it "returns false when passed the wrong password" do
 			Entry.authorized?(:name => "test", :pw => "WRONG").must_equal false
 		end
